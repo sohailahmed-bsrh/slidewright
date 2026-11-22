@@ -12,9 +12,12 @@
 
 <p>
   <a href="#overview">Overview</a> &bull;
+  <a href="#purpose--problem-statement">Purpose</a> &bull;
+  <a href="#real-world-industry-applications">Use Cases</a> &bull;
+  <a href="#step-by-step-engineering-walkthrough">How It Was Built</a> &bull;
   <a href="#system-architecture">Architecture</a> &bull;
   <a href="#visual-showcase-gallery">Visual Gallery</a> &bull;
-  <a href="#core-capabilities">Capabilities</a> &bull;
+  <a href="#technology-stack-matrix">Tech Stack</a> &bull;
   <a href="#installation--setup">Installation</a> &bull;
   <a href="#author--contact-information">Author</a>
 </p>
@@ -25,6 +28,62 @@
 ## Overview
 
 SlideWright is a multi-agent framework designed for autonomous slide presentation generation. Operating through a decoupled multi-agent loop, a specialized Slide Critic Agent inspects and refines narrative outlines, while an independent Designer Agent synthesizes presentation slides. Automated validation schemas enforce visual clarity, preventing layout regressions.
+
+---
+
+## Purpose & Problem Statement
+
+### The Problem
+Single-prompt LLM presentation generators produce poor results: text is overcrowded, narrative pacing is disjointed, and visual formatting is inconsistent. Without a multi-agent separation of concerns (criticism vs design), generative models try to do everything at once, producing mediocre slide decks that require extensive manual reworking.
+
+### The Engineering Purpose
+To build a decoupled multi-agent architecture where distinct specialized agents collaborate through a strict review loop: a Critic Agent that analyzes argument flow and slide density, and a Designer Agent that translates structured critique into balanced presentation components with automated validation.
+
+---
+
+## Real-World Industry Applications
+
+- **Corporate Strategy & Board Briefings**: Synthesizing quarterly financial and operational reports into crisp executive slide decks.
+- **Technical Keynotes & Architecture Overviews**: Translating complex system design documents into clean visual diagrams and talking points.
+- **Consulting Pitch Decks**: Rapidly producing structured client pitch presentations based on initial discovery interview transcripts.
+- **Academic & Research Seminars**: Converting dense technical research papers into structured conference presentation slides.
+
+---
+
+## Step-by-Step Engineering Walkthrough (How It Was Built)
+
+### Step 1: User Topic & Parameter Ingestion
+The user provides a high-level topic, target audience profile, and desired slide count via the React frontend. The orchestrator initializes an agent session context.
+
+### Step 2: Slide Critic Agent (Narrative Analysis)
+The Critic Agent (`agents/critic/run.ts`) ingests the prompt and derives an outline. It analyzes the narrative arc:
+- Does each slide convey a single core thesis?
+- Is information density balanced?
+- Is the pacing appropriate for the target audience?
+The Critic outputs structured structural feedback and actionable revision instructions.
+
+### Step 3: Designer Agent (Visual Layout Synthesis)
+The Designer Agent (`agents/designer/run.ts`) consumes the Critic's approved outline. It maps abstract concepts into concrete slide components: hero headers, two-column metric comparisons, quote blocks, process flows, and key takeaways.
+
+### Step 4: Schema Validation Subsystem
+Before final compilation, slide components are passed through strict validation schemas using **Zod** (`agents/designer/validate.ts`). The validator checks word count limits, color contrast compliance, and grid layout integrity. If validation fails, the specifications are routed back to the Designer Agent for immediate self-correction.
+
+### Step 5: Multi-Format Presentation Compilation
+Approved slide objects are compiled into interactive React slide decks, printable PDF documents, or raw Marp-compatible Markdown bundles.
+
+---
+
+## System Architecture
+
+```mermaid
+flowchart TD
+    A[User Presentation Prompt / Outline] --> B[Multi-Agent Orchestrator]
+    B --> C[Slide Critic Agent: Structure & Logic Analysis]
+    C -->|Evaluation & Structural Feedback| D[Designer Agent: Layout & Styling]
+    D -->|Slide Specifications| E[Automated Schema & Quality Validator]
+    E -->|Validation Passed| F[Rendered High-Definition Slide Deck]
+    E -->|Validation Issues Detected| C
+```
 
 ---
 
@@ -73,28 +132,15 @@ SlideWright is a multi-agent framework designed for autonomous slide presentatio
 
 ---
 
-## System Architecture
+## Technology Stack Matrix
 
-```mermaid
-flowchart TD
-    A[User Presentation Prompt / Outline] --> B[Multi-Agent Orchestrator]
-    B --> C[Slide Critic Agent: Structure & Logic Analysis]
-    C -->|Evaluation & Structural Feedback| D[Designer Agent: Layout & Styling]
-    D -->|Slide Specifications| E[Automated Schema & Quality Validator]
-    E -->|Validation Passed| F[Rendered High-Definition Slide Deck]
-    E -->|Validation Issues Detected| C
-```
-
----
-
-## Technology Stack
-
-| Domain | Technologies |
-| :--- | :--- |
-| Frontend Interface | React, TypeScript, Tailwind CSS |
-| Agent Orchestration | TypeScript Multi-Agent Architecture |
-| Validation | Zod Schemas |
-| Build Tooling | Vite, Node.js |
+| Layer | Technologies | Version / Role | Engineering Purpose |
+| :--- | :--- | :--- | :--- |
+| Agent Orchestration | TypeScript Multi-Agent Engine | Node.js 20.x | Decoupled agent communication and state management |
+| LLM Gateway | OpenRouter API Client | Latest | Multi-model routing between reasoning and creative LLMs |
+| Schema Validation | Zod | 3.22+ | Type-safe JSON schema enforcement and layout validation |
+| Frontend UI | React 18, Vite | 18.2 / 5.0+ | Reactive presentation canvas and agent message inspector |
+| Styling | Tailwind CSS | 3.4+ | Modular typography, dark mode, and grid layouts |
 
 ---
 
